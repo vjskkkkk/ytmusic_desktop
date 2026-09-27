@@ -1,0 +1,31 @@
+{
+  "name": "ytmini",
+  "version": "0.1.0",
+  "description": "YouTube Music desktop app for Windows with a resizable mini player",
+  "main": "src/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win"
+  },
+  "build": {
+    "appId": "com.ytmini.app",
+    "productName": "YT Mini",
+    "icon": "assets/icon.png",
+    "files": [
+      "src/**",
+      "assets/**"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "devDependencies": {
+    "electron": "^44.4.5",
+    "electron-builder": "^26.15.3"
+  }
+}

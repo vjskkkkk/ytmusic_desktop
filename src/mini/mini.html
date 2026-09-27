@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src https: data:; style-src 'self'; script-src 'self'">
+  <title>YT Mini</title>
+  <link rel="stylesheet" href="mini.css">
+</head>
+<body>
+  <div id="player" class="empty show">
+    <div class="art"><img id="art" alt="" hidden></div>
+    <div class="shade"></div>
+
+    <div class="top">
+      <button id="pin" class="icon-btn small" title="Keep on top">
+        <svg viewBox="0 0 24 24"><path d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"/></svg>
+      </button>
+      <button id="expand" class="icon-btn small" title="Open full player (Ctrl+Shift+M)">
+        <svg viewBox="0 0 24 24"><path d="M21 11V3h-8l3.29 3.29-10 10L3 13v8h8l-3.29-3.29 10-10z"/></svg>
+      </button>
+    </div>
+
+    <div class="meta">
+      <div id="title" class="title">Nothing playing</div>
+      <div id="artist" class="artist"></div>
+    </div>
+
+    <div class="controls">
+      <button id="prev" class="icon-btn" title="Previous">
+        <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+      </button>
+      <button id="play" class="icon-btn play" title="Play">
+        <svg viewBox="0 0 24 24"><path id="playIcon" d="M8 5v14l11-7z"/></svg>
+      </button>
+      <button id="next" class="icon-btn" title="Next">
+        <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+      </button>
+    </div>
+
+    <div id="progress" class="progress"><div class="track"><div id="fill" class="fill"></div></div></div>
+  </div>
+  <script src="mini.js"></script>
+</body>
+</html>
