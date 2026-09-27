@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src https: data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self'; connect-src 'self' blob: data: ws://localhost:5173; media-src blob: data:">
+  <title>YT Mini</title>
+  <link rel="stylesheet" href="./classic.css">
+</head>
+<body>
+  <div id="host"></div>
+  <div id="art-panel" hidden>
+    <div class="frame"><img id="art" alt="" draggable="false"></div>
+    <div class="caption"><span id="caption"></span></div>
+  </div>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
