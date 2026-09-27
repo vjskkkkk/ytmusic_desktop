@@ -8,6 +8,9 @@ const skins = require('./skins');
 const win = require('./windows');
 
 app.setAppUserModelId('com.ytmini.app');
+// Installed builds would otherwise be named after productName ("YT Mini"); keep one data folder
+// (sign-in cookies, settings, skins, themes) for both the installed app and `npm start`.
+app.setPath('userData', path.join(app.getPath('appData'), 'ytmini'));
 
 const PLAYER_COMMANDS = new Set(['playPause', 'next', 'prev', 'seek', 'volume', 'like', 'shuffle', 'repeat', 'play', 'playQueueIndex', 'eq']);
 const MAX_THEME_BYTES = 256 * 1024;

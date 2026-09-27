@@ -1,6 +1,6 @@
 {
   "name": "ytmini",
-  "version": "0.2.0-dev",
+  "version": "0.2.0",
   "description": "YouTube Music desktop app for Windows with a resizable mini player",
   "main": "src/main/index.js",
   "private": true,
