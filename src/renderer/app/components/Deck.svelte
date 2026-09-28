@@ -73,7 +73,7 @@
         {#if radio.station.favicon && !favFailed}
           <img src={radio.station.favicon} alt="" onerror={() => (favFailed = true)} />
         {:else}
-          <Icon name="radio" size={26} />
+          <Icon name="radio" size={22} />
         {/if}
       </div>
       <div class="meta">
@@ -82,14 +82,14 @@
       </div>
     {:else if s.hasTrack}
       <button class="sleeve" onclick={onNowPlaying} aria-label="Open now playing">
-        <Art src={s.art} size={56} lazy={false} alt="" />
+        <Art src={s.art} size={50} lazy={false} alt="" />
       </button>
       <div class="meta">
         <button class="title ellipsis" onclick={onNowPlaying}>{s.title}</button>
         <div class="artist ellipsis dim">{s.artist}{s.album ? ` — ${s.album}` : ''}</div>
       </div>
       <button class="icon like" class:on={s.like === 'LIKE'} onclick={() => cmd('like')} aria-label={s.like === 'LIKE' ? 'Remove like' : 'Like'} aria-pressed={s.like === 'LIKE'}>
-        <Icon name={s.like === 'LIKE' ? 'liked' : 'like'} size={20} />
+        <Icon name={s.like === 'LIKE' ? 'liked' : 'like'} size={17} />
       </button>
     {:else}
       <div class="idle dim">Pick something to play</div>
@@ -99,23 +99,23 @@
   <div class="center">
     {#if radio.active}
     <div class="controls">
-      <button class="icon" onclick={prevStation} aria-label="Previous station" disabled={radio.list.length < 2}><Icon name="prev" size={26} /></button>
+      <button class="icon skip" onclick={prevStation} aria-label="Previous station" disabled={radio.list.length < 2}><Icon name="prev" size={19} /></button>
       <button class="playbtn" onclick={toggleRadio} aria-label={radio.playing || radio.loading ? 'Stop' : 'Play'}>
-        {#if radio.loading}<span class="spin" aria-hidden="true"></span>{:else}<Icon name={radio.playing ? 'pause' : 'play'} size={28} />{/if}
+        {#if radio.loading}<span class="spin" aria-hidden="true"></span>{:else}<Icon name={radio.playing ? 'pause' : 'play'} size={17} />{/if}
       </button>
-      <button class="icon" onclick={nextStation} aria-label="Next station" disabled={radio.list.length < 2}><Icon name="next" size={26} /></button>
+      <button class="icon skip" onclick={nextStation} aria-label="Next station" disabled={radio.list.length < 2}><Icon name="next" size={19} /></button>
     </div>
     <div class="radio-note" class:error={!!radio.error}>{radio.error || (radio.loading ? 'Tuning in…' : radio.playing ? 'On air' : 'Stopped')}</div>
     {:else}
     <div class="controls">
-      <button class="icon" class:on={s.shuffle} onclick={() => cmd('shuffle')} aria-label="Shuffle" aria-pressed={!!s.shuffle}><Icon name="shuffle" size={20} /></button>
-      <button class="icon" onclick={() => cmd('prev')} aria-label="Previous"><Icon name="prev" size={26} /></button>
+      <button class="icon" class:on={s.shuffle} onclick={() => cmd('shuffle')} aria-label="Shuffle" aria-pressed={!!s.shuffle}><Icon name="shuffle" size={17} /></button>
+      <button class="icon skip" onclick={() => cmd('prev')} aria-label="Previous"><Icon name="prev" size={19} /></button>
       <button class="playbtn" onclick={() => cmd('playPause')} aria-label={s.playing ? 'Pause' : 'Play'} disabled={!s.hasTrack}>
-        <Icon name={s.playing ? 'pause' : 'play'} size={28} />
+        <Icon name={s.playing ? 'pause' : 'play'} size={17} />
       </button>
-      <button class="icon" onclick={() => cmd('next')} aria-label="Next"><Icon name="next" size={26} /></button>
+      <button class="icon skip" onclick={() => cmd('next')} aria-label="Next"><Icon name="next" size={19} /></button>
       <button class="icon" class:on={s.repeat && s.repeat !== 'NONE'} onclick={() => cmd('repeat')} aria-label={`Repeat: ${(s.repeat || 'NONE').toLowerCase()}`}>
-        <Icon name={s.repeat === 'ONE' ? 'repeatOne' : 'repeat'} size={20} />
+        <Icon name={s.repeat === 'ONE' ? 'repeatOne' : 'repeat'} size={17} />
       </button>
     </div>
     <div class="progress">
@@ -138,14 +138,14 @@
 
   <div class="right">
     <button class="icon" onclick={toggleMute} aria-label={vol > 0 ? 'Mute' : 'Unmute'}>
-      <Icon name={vol > 0 ? 'volume' : 'mute'} size={20} />
+      <Icon name={vol > 0 ? 'volume' : 'mute'} size={17} />
     </button>
     <input class="vol" type="range" min="0" max="100" value={vol} oninput={onVolume} aria-label="Volume" style:--v={`${vol}%`} />
     <button class="icon" class:on={panelOpen} onclick={() => (panelOpen = !panelOpen)} aria-label="Up next and lyrics" aria-pressed={panelOpen}>
-      <Icon name="queue" size={20} />
+      <Icon name="queue" size={17} />
     </button>
     <button class="icon" onclick={() => ytm.showMini()} aria-label="Mini player (Ctrl+Shift+M)" title="Mini player (Ctrl+Shift+M)">
-      <Icon name="mini" size={20} />
+      <Icon name="mini" size={17} />
     </button>
   </div>
 </footer>
@@ -164,8 +164,8 @@
     z-index: 10;
   }
   .station-logo {
-    width: 56px;
-    height: 56px;
+    width: 50px;
+    height: 50px;
     flex: none;
     border-radius: 12px;
     overflow: hidden;
@@ -188,72 +188,95 @@
     box-shadow: inset 0 0 0 1px var(--lg-edge);
   }
   .live.on { color: var(--accent-ink); background: var(--accent); box-shadow: none; }
-  .radio-note { font-size: 11.5px; color: var(--text-faint); height: 16px; }
+  .radio-note { font-size: 11px; color: var(--text-faint); height: 14px; line-height: 14px; }
   .radio-note.error { color: var(--text); }
-  .spin { width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid currentColor; border-right-color: transparent; animation: spin 0.8s linear infinite; }
+  .spin { width: 15px; height: 15px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .now { display: flex; align-items: center; gap: 12px; min-width: 0; }
-  .sleeve { border-radius: var(--r-sleeve); }
+  .sleeve { border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); }
+  .sleeve :global(.art) { border-radius: 8px; }
   .meta { min-width: 0; display: flex; flex-direction: column; }
   .title { font-weight: 650; text-align: left; max-width: 100%; }
   .title:hover { text-decoration: underline; text-underline-offset: 3px; }
   .artist { font-size: 12.5px; }
   .idle { font-size: 13px; }
+  /* Controls: light line icons on the glass; a hover chip of the same material; the one
+     accent-tinted glass disc for play (skill: tint only the primary action). */
   .icon {
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     display: grid;
     place-items: center;
     color: var(--text-dim);
     flex: none;
+    transition: color 0.15s var(--ease), background-color 0.15s var(--ease), transform 0.15s var(--ease);
   }
-  .icon:hover:not(:disabled) { color: var(--text); background: color-mix(in oklab, var(--text) 10%, transparent); }
+  .icon:hover:not(:disabled) { color: var(--text); background: color-mix(in oklab, var(--text) 9%, transparent); }
+  .icon:active:not(:disabled) { transform: scale(0.92); }
   .icon:disabled { opacity: 0.35; cursor: default; }
-  .icon.on { color: var(--accent); }
-  .center { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-  .controls { display: flex; align-items: center; gap: 10px; }
+  .icon.on { color: var(--accent); background: color-mix(in oklab, var(--accent) 14%, transparent); }
+  .icon.on:hover { color: var(--accent); background: color-mix(in oklab, var(--accent) 20%, transparent); }
+  .skip { width: 32px; height: 32px; color: var(--text); }
+
+  /* Controls sit centred in the space above the seek bar; the seek bar hugs the bottom edge. */
+  .center {
+    align-self: stretch;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    justify-items: center;
+    padding-bottom: 7px;
+    min-width: 0;
+  }
+  .controls { align-self: center; display: flex; align-items: center; gap: 8px; }
   .playbtn {
-    width: 42px;
-    height: 42px;
+    width: 36px;
+    height: 36px;
+    margin: 0 6px;
     border-radius: 50%;
     display: grid;
     place-items: center;
-    background: var(--text);
-    color: var(--bg);
-    box-shadow: inset 0 1px 0 color-mix(in oklab, white 45%, transparent), 0 4px 14px color-mix(in oklab, var(--text) 18%, transparent);
-    transition: transform 0.18s var(--ease);
+    background: var(--lg-primary);
+    color: var(--accent-ink);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, white 45%, transparent),
+      inset 0 0 0 1px color-mix(in oklab, var(--accent) 60%, white 12%),
+      0 4px 14px color-mix(in oklab, var(--accent) 28%, transparent);
+    transition: transform 0.18s var(--ease), background-color 0.18s var(--ease);
   }
-  .playbtn:hover:not(:disabled) { transform: scale(1.05); }
+  .playbtn :global(svg) { transform: translateX(0.5px); }
+  .playbtn:hover:not(:disabled) { transform: scale(1.06); background: color-mix(in oklab, var(--accent) 94%, white); }
+  .playbtn:active:not(:disabled) { transform: scale(0.94); }
   .playbtn:disabled { opacity: 0.4; cursor: default; }
-  .progress { display: flex; align-items: center; gap: 10px; width: 100%; }
-  .t { font-size: 11.5px; color: var(--text-faint); font-variant-numeric: tabular-nums; min-width: 38px; text-align: center; }
-  .right { display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
+  .progress { display: flex; align-items: center; gap: 8px; width: 100%; }
+  .t { font-size: 10.5px; color: var(--text-faint); font-variant-numeric: tabular-nums; min-width: 34px; text-align: center; }
+  .right { display: flex; align-items: center; justify-content: flex-end; gap: 2px; }
 
   input[type='range'] {
     -webkit-appearance: none;
     appearance: none;
     flex: 1;
-    height: 16px;
+    height: 14px;
     background: transparent;
     cursor: pointer;
   }
   input[type='range']::-webkit-slider-runnable-track {
-    height: 4px;
-    border-radius: 4px;
+    height: 3px;
+    border-radius: 3px;
     background: linear-gradient(to right, var(--accent) var(--pct), color-mix(in oklab, var(--text) 16%, transparent) var(--pct));
   }
-  input.vol { flex: 0 0 96px; }
+  input.vol { flex: 0 0 88px; margin-right: 6px; }
   input.vol::-webkit-slider-runnable-track {
     background: linear-gradient(to right, var(--text-dim) var(--v), color-mix(in oklab, var(--text) 16%, transparent) var(--v));
   }
   input[type='range']::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 12px;
-    height: 12px;
+    width: 11px;
+    height: 11px;
     margin-top: -4px;
     border-radius: 50%;
-    background: var(--text);
+    background: color-mix(in oklab, white 92%, transparent);
+    box-shadow: 0 0 0 0.5px color-mix(in oklab, black 25%, transparent), 0 1px 4px rgba(0, 0, 0, 0.35);
     opacity: 0;
     transition: opacity 0.12s;
   }
