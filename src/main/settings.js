@@ -15,6 +15,8 @@ const settings = {
   classicArt: true,
   skin: null, // file name in the skins folder; null = Webamp's base skin
   theme: 'midnight',
+  glass: 60, // 0 = solid surfaces, 100 = clearest glass
+  userName: null, // null = not asked yet; '' = skipped
   volume: null,
 };
 

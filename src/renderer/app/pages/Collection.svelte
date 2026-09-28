@@ -66,8 +66,8 @@
         {/if}
         {#if data.meta}<p class="meta dim">{data.meta}</p>{/if}
         <div class="actions">
-          <button class="primary" onclick={() => play(data.play)} disabled={!data.play}><Icon name="play" size={22} />Play</button>
-          <button class="ghost" onclick={shuffle} disabled={!data.tracks.length}><Icon name="shuffle" size={20} />Shuffle</button>
+          <button class="primary lg-primary" onclick={() => play(data.play)} disabled={!data.play}><Icon name="play" size={22} />Play</button>
+          <button class="ghost lg-ctl" onclick={shuffle} disabled={!data.tracks.length}><Icon name="shuffle" size={20} />Shuffle</button>
         </div>
       </div>
     </header>
@@ -77,7 +77,7 @@
     <TrackTable tracks={data.tracks} showArt={kind !== 'album'} showAlbum={kind !== 'album'} />
 
     {#if data.hasMore}
-      <button class="more" onclick={more} disabled={loadingMore}>{loadingMore ? 'Loading…' : 'Show more songs'}</button>
+      <button class="more lg-ctl" onclick={more} disabled={loadingMore}>{loadingMore ? 'Loading…' : 'Show more songs'}</button>
     {/if}
 
     {#each data.sections || [] as shelf, i (i)}
@@ -115,8 +115,6 @@
     border-radius: var(--r-pill);
     font-weight: 650;
   }
-  .primary { background: var(--accent); color: var(--accent-ink); }
-  .ghost, .more { background: var(--bg-elev-2); }
   .primary:disabled, .ghost:disabled { opacity: 0.4; cursor: default; }
   .desc { max-width: 72ch; margin: 0 0 24px; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   .more { margin: 18px 0 0 10px; padding: 0 18px; }

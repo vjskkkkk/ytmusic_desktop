@@ -12,8 +12,11 @@
   import Collection from './pages/Collection.svelte';
   import Artist from './pages/Artist.svelte';
   import Settings from './pages/Settings.svelte';
+  import Radio from './pages/Radio.svelte';
+  import Backdrop from './components/Backdrop.svelte';
   import { route } from './lib/router.svelte.js';
   import { cmd } from './lib/player.svelte.js';
+  import { radio, toggleRadio, nextStation, prevStation } from './lib/radio.svelte.js';
   import { ytm } from './lib/bridge.js';
   import { initTheme } from './lib/theme.svelte.js';
 
@@ -47,11 +50,14 @@
       return;
     } else if (e.code === 'Space') {
       e.preventDefault();
-      cmd('playPause');
+      if (radio.active) toggleRadio();
+      else cmd('playPause');
     } else if (e.ctrlKey && e.key === 'ArrowRight') {
-      cmd('next');
+      if (radio.active) nextStation();
+      else cmd('next');
     } else if (e.ctrlKey && e.key === 'ArrowLeft') {
-      cmd('prev');
+      if (radio.active) prevStation();
+      else cmd('prev');
     } else if (e.ctrlKey && e.key.toLowerCase() === 'l') {
       e.preventDefault();
       cmd('like');
@@ -68,6 +74,7 @@
 <svelte:window onkeydown={onKey} />
 
 <div class="shell" class:panel={panelOpen}>
+  <Backdrop />
   <Sidebar {signedIn} />
   <TitleBar bind:this={titleBar} />
 
@@ -95,6 +102,8 @@
         <Artist id={route.params[0]} />
       {:else if route.name === 'browse'}
         <Browse id={route.params[0]} params={route.params[1]} />
+      {:else if route.name === 'radio'}
+        <Radio genre={route.params[0] || ''} query={route.params[1] || ''} />
       {:else if route.name === 'settings'}
         <Settings {signedIn} />
       {/if}
@@ -125,7 +134,19 @@
       'deck deck deck';
   }
   .shell.panel { grid-template-columns: var(--sidebar-w) minmax(0, 1fr) var(--panel-w); }
-  main { grid-area: main; overflow-y: auto; overflow-x: hidden; min-width: 0; scroll-behavior: smooth; }
+  /* Page content runs the full height, under the floating glass title bar and player bar. */
+  main {
+    grid-row: 1 / -1;
+    grid-column: 2;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-width: 0;
+    scroll-behavior: smooth;
+    padding: var(--titlebar-h) 0 calc(var(--deck-h) + 8px);
+    scroll-padding-top: var(--titlebar-h);
+  }
+  /* keep the scrollbar clear of the title bar and player bar */
+  main::-webkit-scrollbar-track { margin: var(--titlebar-h) 0 var(--deck-h); }
   .signin-note {
     display: flex;
     align-items: center;

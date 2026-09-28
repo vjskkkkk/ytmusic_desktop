@@ -44,6 +44,8 @@ export function fixtureBridge() {
       minimizeToMini: true,
       miniOnTop: true,
       skin: null,
+      glass: Number(params.get('glass') ?? 60),
+      userName: params.has('name') ? params.get('name') : null,
     }),
     setSetting: async () => true,
     onSettings: off,
@@ -54,5 +56,8 @@ export function fixtureBridge() {
     deleteSkin: async () => true,
     selectSkin: () => {},
     currentSkin: async () => null,
+    radioApi: async (method) => (method === 'genres' ? (await load('radio-genres')) ?? [] : (await load('radio-stations')) ?? []),
+    setRadioState: () => {},
+    onRadioCmd: off,
   };
 }

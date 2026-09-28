@@ -63,7 +63,7 @@
   }
 </script>
 
-<header class="titlebar">
+<header class="titlebar lg-regular">
   <div class="navbtns">
     <button onclick={back} aria-label="Back"><Icon name="left" /></button>
     <button onclick={forward} aria-label="Forward"><Icon name="right" /></button>
@@ -84,7 +84,7 @@
     />
     <kbd>Ctrl K</kbd>
     {#if open && flat.length}
-      <div class="dropdown" role="listbox">
+      <div class="dropdown lg-thick" role="listbox">
         {#each flat as entry, i (i)}
           <button class="opt" class:active={i === active} role="option" aria-selected={i === active} onmousedown={() => choose(entry)}>
             {#if entry.type === 'query'}
@@ -112,8 +112,9 @@
     gap: 14px;
     padding: 0 150px 0 16px; /* leave room for the window buttons */
     -webkit-app-region: drag;
-    position: relative;
     z-index: 20;
+    /* a glass strip that page content scrolls under; only a hairline below, no drop shadow */
+    box-shadow: inset 0 -1px 0 var(--lg-edge);
   }
   .navbtns { display: flex; gap: 4px; -webkit-app-region: no-drag; }
   .navbtns button {
@@ -124,7 +125,7 @@
     place-items: center;
     color: var(--text-dim);
   }
-  .navbtns button:hover { background: var(--bg-elev-2); color: var(--text); }
+  .navbtns button:hover { background: color-mix(in oklab, var(--text) 10%, transparent); color: var(--text); }
   .search {
     position: relative;
     display: flex;
@@ -134,12 +135,17 @@
     height: 30px;
     padding: 0 10px;
     border-radius: var(--r-pill);
-    background: var(--bg-elev-2);
+    background: color-mix(in oklab, var(--text) 8%, transparent);
+    box-shadow: inset 0 1px 0 var(--lg-light), inset 0 0 0 1px var(--lg-edge);
     color: var(--text-dim);
     -webkit-app-region: no-drag;
+    transition: background-color 0.18s var(--ease), box-shadow 0.18s var(--ease);
   }
-  .search:focus-within { background: var(--bg-hover); color: var(--text); }
-  .search.open { border-radius: 15px 15px 0 0; }
+  .search:focus-within {
+    background: color-mix(in oklab, var(--text) 12%, transparent);
+    box-shadow: inset 0 1px 0 var(--lg-light), inset 0 0 0 1px color-mix(in oklab, var(--accent) 55%, transparent);
+    color: var(--text);
+  }
   input {
     flex: 1;
     min-width: 0;
@@ -157,14 +163,13 @@
     top: 100%;
     left: 0;
     right: 0;
-    background: var(--bg-hover);
-    border-radius: 0 0 12px 12px;
+    margin-top: 6px;
+    border-radius: 16px;
     padding: 6px;
-    box-shadow: var(--shadow-lift);
     display: flex;
     flex-direction: column;
   }
   .opt { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 6px; text-align: left; color: var(--text); min-width: 0; }
-  .opt.active, .opt:hover { background: var(--bg-elev-2); }
+  .opt.active, .opt:hover { background: color-mix(in oklab, var(--text) 10%, transparent); }
   .opt-text { display: flex; flex-direction: column; min-width: 0; font-size: 13px; }
 </style>

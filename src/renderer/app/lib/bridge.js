@@ -11,4 +11,6 @@ export const ytm = {
   api: (method, ...args) => raw.api(method, ...args.map(plain)),
   cmd: (name, arg) => raw.cmd(name, plain(arg)),
   setSetting: (key, value) => raw.setSetting(key, plain(value)),
+  radioApi: (method, ...args) => raw.radioApi(method, ...args.map(plain)),
+  setRadioState: (state) => raw.setRadioState(plain(state)),
 };

@@ -19,7 +19,7 @@
   <h1 class="title">Library</h1>
   <div class="tabs" role="tablist">
     {#each TABS as t (t.id)}
-      <button role="tab" aria-selected={tab === t.id} class:active={tab === t.id} onclick={() => go('library', t.id)}>{t.label}</button>
+      <button role="tab" aria-selected={tab === t.id} class="lg-ctl" class:lg-selected={tab === t.id} class:active={tab === t.id} onclick={() => go('library', t.id)}>{t.label}</button>
     {/each}
   </div>
 
@@ -47,9 +47,7 @@
   .page { padding: 16px 40px 40px; }
   .title { font-size: 44px; font-weight: 800; font-stretch: 85%; letter-spacing: -0.02em; margin-bottom: 18px; }
   .tabs { display: flex; gap: 6px; margin-bottom: 28px; }
-  .tabs button { padding: 7px 16px; border-radius: var(--r-pill); background: var(--bg-elev-2); font-weight: 600; font-size: 13.5px; }
-  .tabs button:hover { background: var(--bg-hover); }
-  .tabs button.active { background: var(--text); color: var(--bg); }
+  .tabs button { padding: 7px 16px; border-radius: var(--r-pill); font-weight: 600; font-size: 13.5px; }
   .signin { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; padding: 24px 0; color: var(--text-dim); }
   .signin button { padding: 10px 20px; border-radius: var(--r-pill); background: var(--accent); color: var(--accent-ink); font-weight: 650; }
 </style>

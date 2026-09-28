@@ -16,6 +16,18 @@
   let chip = $state(null);
   let loadingMore = false;
 
+  // First name for the greeting. null = never asked, '' = the user skipped.
+  let userName = $state(undefined);
+  let nameDraft = $state('');
+  ytm.getSettings().then((st) => (userName = st?.userName ?? null));
+  $effect(() => ytm.onSettings((st) => (userName = st?.userName ?? null)));
+
+  function saveName(e) {
+    e.preventDefault();
+    const n = nameDraft.trim();
+    if (n) ytm.setSetting('userName', n.slice(0, 40));
+  }
+
   async function load() {
     error = null;
     data = null;
@@ -60,28 +72,44 @@
   }
 </script>
 
+{#snippet askName()}
+  <form class="ask lg-static" onsubmit={saveName}>
+    <label for="first-name">What should we call you?</label>
+    <div class="ask-row">
+      <input id="first-name" bind:value={nameDraft} placeholder="Your first name" maxlength="40" autocomplete="given-name" spellcheck="false" />
+      <button class="lg-primary" type="submit" disabled={!nameDraft.trim()}>Save</button>
+      <button class="lg-ctl" type="button" onclick={() => ytm.setSetting('userName', '')}>Skip</button>
+    </div>
+  </form>
+{/snippet}
+
 <div class="page">
   <section class="hero" class:playing={s.hasTrack}>
     {#if s.hasTrack}
       <div class="wash" style:background-image={s.art ? `url("${s.art}")` : null}></div>
       <div class="hero-text">
-        <p class="state dim">{s.playing ? 'Now playing' : 'Paused'}</p>
+        <p class="state dim">{greeting(new Date(), userName || '')} · {s.playing ? 'Now playing' : 'Paused'}</p>
         <h1 class="big">{s.title}</h1>
         <p class="by">{s.artist}</p>
         <div class="actions">
-          <button class="primary" onclick={() => cmd('playPause')}>
+          <button class="primary lg-primary" onclick={() => cmd('playPause')}>
             <Icon name={s.playing ? 'pause' : 'play'} size={22} />{s.playing ? 'Pause' : 'Resume'}
           </button>
-          <button class="ghost" onclick={onNowPlaying}>Lyrics and full view</button>
+          <button class="ghost lg-ctl" onclick={onNowPlaying}>Lyrics and full view</button>
         </div>
+        {#if userName === null}{@render askName()}{/if}
       </div>
       <button class="record-btn" onclick={onNowPlaying} aria-label="Open now playing">
         <Record art={s.art} playing={s.playing} size={210} />
       </button>
     {:else}
       <div class="hero-text">
-        <h1 class="big">{greeting()}</h1>
-        <p class="by dim">Pick up where you left off, or find something new below.</p>
+        <h1 class="big">{greeting(new Date(), userName || '')}</h1>
+        {#if userName === null}
+          {@render askName()}
+        {:else}
+          <p class="by dim">Pick up where you left off, or find something new below.</p>
+        {/if}
       </div>
     {/if}
   </section>
@@ -89,7 +117,7 @@
   {#if data?.chips?.length}
     <div class="chips" role="toolbar" aria-label="Filter home">
       {#each data.chips as c (c)}
-        <button class="chip" class:active={chip === c} aria-pressed={chip === c} onclick={() => filter(c)}>{c}</button>
+        <button class="chip lg-ctl" class:lg-selected={chip === c} class:active={chip === c} aria-pressed={chip === c} onclick={() => filter(c)}>{c}</button>
       {/each}
     </div>
   {/if}
@@ -161,15 +189,38 @@
     border-radius: var(--r-pill);
     font-weight: 650;
   }
-  .primary { background: var(--accent); color: var(--accent-ink); padding-left: 12px; }
-  .primary:hover { filter: brightness(1.08); }
-  .ghost { background: var(--bg-elev-2); }
-  .ghost:hover { background: var(--bg-hover); }
+  .primary { padding-left: 12px; }
   .record-btn { position: relative; z-index: 1; border-radius: var(--r-sleeve); }
   .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 30px; }
-  .chip { padding: 7px 14px; border-radius: var(--r-pill); background: var(--bg-elev-2); font-size: 13px; font-weight: 550; }
-  .chip:hover { background: var(--bg-hover); }
-  .chip.active { background: var(--text); color: var(--bg); }
+  .chip { padding: 7px 14px; border-radius: var(--r-pill); font-size: 13px; font-weight: 550; }
+  .chip.active { color: var(--text); font-weight: 650; }
+  .ask {
+    margin-top: 18px;
+    padding: 14px 16px 16px;
+    border-radius: var(--lg-r-bar);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 460px;
+  }
+  .ask label { font-weight: 650; font-size: 14.5px; }
+  .ask-row { display: flex; gap: 8px; }
+  .ask input {
+    flex: 1;
+    min-width: 0;
+    height: 38px;
+    padding: 0 14px;
+    border: 0;
+    outline: none;
+    border-radius: var(--lg-r-control);
+    background: color-mix(in oklab, var(--bg) 70%, transparent);
+    box-shadow: inset 0 0 0 1px var(--lg-edge);
+    color: var(--text);
+    font: inherit;
+  }
+  .ask input:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
+  .ask button { height: 38px; padding: 0 16px; border-radius: var(--lg-r-control); font-weight: 650; }
+  .ask button:disabled { opacity: 0.5; cursor: default; }
   .more { min-height: 40px; }
   @media (max-width: 1150px) { .record-btn { display: none; } }
 </style>

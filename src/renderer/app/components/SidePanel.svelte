@@ -28,10 +28,10 @@
   ];
 </script>
 
-<aside class="panel">
+<aside class="panel lg-static">
   <div class="tabs" role="tablist">
     {#each TABS as t (t.id)}
-      <button role="tab" aria-selected={tab === t.id} class:active={tab === t.id} onclick={() => (tab = t.id)}>{t.label}</button>
+      <button role="tab" aria-selected={tab === t.id} class:lg-selected={tab === t.id} class:active={tab === t.id} onclick={() => (tab = t.id)}>{t.label}</button>
     {/each}
     <button class="close" onclick={onclose} aria-label="Close panel"><Icon name="close" size={18} /></button>
   </div>
@@ -104,20 +104,19 @@
     display: flex;
     flex-direction: column;
     min-height: 0;
-    border-left: 1px solid var(--line);
-    background: var(--bg-elev);
+    box-shadow: inset 1px 0 0 var(--lg-edge);
   }
   .tabs { display: flex; align-items: center; gap: 4px; padding: 10px 10px 6px; }
   .tabs button[role='tab'] { padding: 6px 12px; border-radius: var(--r-pill); color: var(--text-dim); font-weight: 600; font-size: 13px; }
-  .tabs button.active { background: var(--bg-elev-2); color: var(--text); }
+  .tabs button.active { color: var(--text); }
   .close { margin-left: auto; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; color: var(--text-dim); }
-  .close:hover { background: var(--bg-elev-2); color: var(--text); }
+  .close:hover { background: color-mix(in oklab, var(--text) 10%, transparent); color: var(--text); }
   .body { flex: 1; overflow-y: auto; padding: 6px 8px 16px; }
   .body :global(.row) { grid-template-columns: 30px minmax(0, 1fr) 48px; }
   .queue { display: flex; flex-direction: column; }
   .q { display: flex; align-items: center; gap: 10px; padding: 6px; border-radius: 6px; text-align: left; min-width: 0; }
-  .q:hover { background: var(--bg-elev-2); }
-  .q.selected { background: var(--bg-elev-2); }
+  .q:hover { background: color-mix(in oklab, var(--text) 8%, transparent); }
+  .q.selected { background: var(--lg-selected); box-shadow: inset 0 0 0 1px var(--lg-selected-edge); }
   .q.selected .qt span:first-child { color: var(--accent); }
   .qt { display: flex; flex-direction: column; min-width: 0; flex: 1; font-size: 13px; }
   .dur { font-size: 12px; font-variant-numeric: tabular-nums; }

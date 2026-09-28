@@ -24,6 +24,7 @@
   const NAV = [
     { name: 'home', label: 'Home', icon: 'home' },
     { name: 'explore', label: 'Explore', icon: 'explore' },
+    { name: 'radio', label: 'Radio', icon: 'radio' },
     { name: 'library', label: 'Library', icon: 'library' },
   ];
 
@@ -38,7 +39,7 @@
   }
 </script>
 
-<aside class="sidebar">
+<aside class="sidebar lg-static">
   <div class="brand">
     <span class="mark" aria-hidden="true"></span>
     <span class="word">YT Mini</span>
@@ -46,7 +47,7 @@
 
   <nav>
     {#each NAV as n (n.name)}
-      <button class="nav" class:active={route.name === n.name} onclick={() => go(n.name)}>
+      <button class="nav" class:active={route.name === n.name} class:lg-selected={route.name === n.name} aria-current={route.name === n.name ? 'page' : undefined} onclick={() => go(n.name)}>
         <Icon name={n.icon} />{n.label}
       </button>
     {/each}
@@ -75,7 +76,7 @@
     {/if}
   </div>
 
-  <button class="nav settings" class:active={route.name === 'settings'} onclick={() => go('settings')}>
+  <button class="nav settings" class:active={route.name === 'settings'} class:lg-selected={route.name === 'settings'} aria-current={route.name === 'settings' ? 'page' : undefined} onclick={() => go('settings')}>
     <Icon name="settings" />Themes and settings
   </button>
 </aside>
@@ -85,8 +86,9 @@
     grid-area: side;
     display: flex;
     flex-direction: column;
-    background: var(--bg-elev);
-    border-right: 1px solid var(--line);
+    /* sits on the page, not over scrolling content: static glass, no backdrop sampling */
+    border-radius: 0;
+    box-shadow: inset -1px 0 0 var(--lg-edge);
     min-height: 0;
     padding: 0 10px 12px;
   }
@@ -115,13 +117,13 @@
     align-items: center;
     gap: 14px;
     padding: 9px 10px;
-    border-radius: 8px;
+    border-radius: var(--lg-r-control);
     color: var(--text-dim);
     font-weight: 550;
     text-align: left;
   }
-  .nav:hover { color: var(--text); background: var(--bg-elev-2); }
-  .nav.active { color: var(--text); background: var(--bg-elev-2); }
+  .nav:not(.active):hover { color: var(--text); background: color-mix(in oklab, var(--text) 8%, transparent); }
+  .nav.active { color: var(--text); }
   .nav.active :global(svg) { color: var(--accent); }
 
   .lists {
@@ -156,22 +158,12 @@
     align-items: center;
     gap: 10px;
     padding: 5px 8px 5px 6px;
-    border-radius: 8px;
+    border-radius: 10px;
     text-align: left;
     min-width: 0;
   }
-  .pl:hover { background: var(--bg-elev-2); }
-  .pl.open { background: var(--bg-elev-2); }
-  .pl.open::before {
-    content: '';
-    position: absolute;
-    left: -4px;
-    top: 10px;
-    bottom: 10px;
-    width: 3px;
-    border-radius: 3px;
-    background: var(--accent);
-  }
+  .pl:not(.open):hover { background: color-mix(in oklab, var(--text) 8%, transparent); }
+  .pl.open { background: var(--lg-selected); box-shadow: inset 0 1px 0 var(--lg-light), inset 0 0 0 1px var(--lg-selected-edge); }
   .pl :global(.art) { border-radius: var(--r-sleeve); }
   .pl-text { display: flex; flex-direction: column; min-width: 0; flex: 1; line-height: 1.25; }
   .pl-name { font-size: 13.5px; font-weight: 550; color: var(--text); }

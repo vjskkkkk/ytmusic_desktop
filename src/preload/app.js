@@ -18,6 +18,11 @@ contextBridge.exposeInMainWorld('ytm', {
   onState: on('player:state'),
   onQueue: on('player:queue'),
 
+  // internet radio (plays in this window; main mirrors it to the mini player and tray)
+  radioApi: (method, ...args) => ipcRenderer.invoke('radio:api', method, args),
+  setRadioState: (state) => ipcRenderer.send('radio:state', state),
+  onRadioCmd: on('radio:cmd'),
+
   // account
   isSignedIn: () => ipcRenderer.invoke('auth:status'),
   signIn: () => ipcRenderer.send('auth:signin'),

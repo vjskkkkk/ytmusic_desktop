@@ -26,8 +26,8 @@
   {#if header}{@render header()}{:else}<h2>{title}</h2>{/if}
   {#if !(atStart && atEnd)}
     <div class="arrows">
-      <button onclick={() => page(-1)} disabled={atStart} aria-label="Scroll left"><Icon name="left" /></button>
-      <button onclick={() => page(1)} disabled={atEnd} aria-label="Scroll right"><Icon name="right" /></button>
+      <button class="lg-ctl" onclick={() => page(-1)} disabled={atStart} aria-label="Scroll left"><Icon name="left" /></button>
+      <button class="lg-ctl" onclick={() => page(1)} disabled={atEnd} aria-label="Scroll right"><Icon name="right" /></button>
     </div>
   {/if}
 </div>
@@ -45,11 +45,9 @@
     border-radius: 50%;
     display: grid;
     place-items: center;
-    background: var(--bg-elev-2);
     color: var(--text);
   }
   .arrows button:disabled { opacity: 0.35; cursor: default; }
-  .arrows button:not(:disabled):hover { background: var(--bg-hover); }
   .row {
     display: flex;
     gap: 18px;

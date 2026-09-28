@@ -152,3 +152,6 @@ button, .progress { -webkit-app-region: no-drag; }
 @media (max-height: 139px) and (max-width: 199px) {
   #prev, #next { display: none; }
 }
+
+/* internet radio is live: no progress bar */
+#player.live #progress { display: none; }

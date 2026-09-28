@@ -154,6 +154,30 @@ app.whenReady().then(async () => {
   await win.w.app.webContents.executeJavaScript(`window.ytm.setSetting('theme', ${JSON.stringify(originalTheme)})`);
   await wait(500);
 
+  // World radio: genres render and a station plays, pausing YouTube Music.
+  win.w.app.webContents.setAudioMuted(true);
+  await win.w.app.webContents.executeJavaScript(`location.hash = '#/radio'`);
+  await wait(1500);
+  const tiles = await win.w.app.webContents.executeJavaScript(`document.querySelectorAll('.genre').length`);
+  check('radio shows genre tiles', tiles >= 20, `${tiles}`);
+  await win.w.app.webContents.executeJavaScript(`location.hash = '#/radio/jazz'`);
+  await wait(8000);
+  const stations = await win.w.app.webContents.executeJavaScript(`document.querySelectorAll('.station').length`);
+  check('radio lists stations for a genre', stations > 0, `${stations}`);
+  if (stations) {
+    if (!engine.state.playing) engine.send('playPause');
+    await wait(1500);
+    await win.w.app.webContents.executeJavaScript(`document.querySelector('.station').click()`);
+    await wait(8000);
+    const onAir = await win.w.app.webContents.executeJavaScript(`!!document.querySelector('.deck .live.on')`);
+    check('radio station plays', onAir);
+    check('radio pauses YouTube Music', engine.state.playing === false);
+    await shot(win.w.app, 'app-radio');
+    engine.send('playPause'); // YouTube Music again: radio stops
+    await wait(3000);
+    check('YouTube Music stops the radio', !win.radio.active);
+  }
+
   settings.miniStyle = originalStyle;
   writeSettings();
 

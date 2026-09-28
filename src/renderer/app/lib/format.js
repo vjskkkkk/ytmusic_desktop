@@ -9,10 +9,9 @@ export function time(seconds) {
 export const artistNames = (item) =>
   item?.artists?.length ? item.artists.map((a) => a.name).join(', ') : item?.subtitle || '';
 
-export function greeting(date = new Date()) {
+export function greeting(date = new Date(), name = '') {
   const h = date.getHours();
-  if (h < 5) return 'Up late';
-  if (h < 12) return 'Good morning';
-  if (h < 18) return 'Good afternoon';
-  return 'Good evening';
+  const base = h < 5 ? 'Up late' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  const first = (name || '').trim();
+  return first ? `${base}, ${first}` : base;
 }

@@ -11,6 +11,7 @@ let hover = false;
 function render() {
   const player = $('player');
   player.classList.toggle('empty', !state.hasTrack);
+  player.classList.toggle('live', !!state.live); // internet radio: no progress to show
   // Controls stay out of the way while music plays; they appear on hover or when paused.
   player.classList.toggle('show', hover || !state.playing || !state.hasTrack);
 
@@ -50,6 +51,7 @@ $('expand').addEventListener('click', () => window.mini.expand());
 $('pin').addEventListener('click', () => window.mini.togglePin());
 
 $('progress').addEventListener('click', (e) => {
+  if (state.live) return;
   const r = e.currentTarget.getBoundingClientRect();
   const frac = Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1);
   window.mini.cmd('seek', frac);

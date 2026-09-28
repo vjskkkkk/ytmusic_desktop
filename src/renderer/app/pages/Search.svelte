@@ -22,7 +22,7 @@
   {#if query}
     <div class="filters" role="toolbar" aria-label="Filter results">
       {#each FILTERS as f (f.id)}
-        <button class:active={filter === f.id} aria-pressed={filter === f.id} onclick={() => go('search', query, f.id)}>{f.label}</button>
+        <button class="lg-ctl" class:lg-selected={filter === f.id} class:active={filter === f.id} aria-pressed={filter === f.id} onclick={() => go('search', query, f.id)}>{f.label}</button>
       {/each}
     </div>
     {#await page}
@@ -48,9 +48,7 @@
   .page { padding: 16px 40px 40px; }
   .title { font-size: 36px; font-weight: 800; font-stretch: 85%; letter-spacing: -0.02em; margin-bottom: 18px; overflow-wrap: anywhere; }
   .filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 28px; }
-  .filters button { padding: 7px 14px; border-radius: var(--r-pill); background: var(--bg-elev-2); font-weight: 600; font-size: 13px; }
-  .filters button:hover { background: var(--bg-hover); }
-  .filters button.active { background: var(--text); color: var(--bg); }
+  .filters button { padding: 7px 14px; border-radius: var(--r-pill); font-weight: 600; font-size: 13px; }
   .dym { margin: -10px 0 24px; }
   .dym .link { color: var(--accent); font-weight: 600; }
 </style>

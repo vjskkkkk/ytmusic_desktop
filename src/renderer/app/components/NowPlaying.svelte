@@ -12,7 +12,7 @@
 
 <div class="np" role="dialog" aria-label="Now playing">
   <div class="wash" style:background-image={s.art ? `url("${s.art}")` : null}></div>
-  <button class="close" onclick={onclose} aria-label="Close now playing"><Icon name="down" size={26} /></button>
+  <button class="close lg-ctl" onclick={onclose} aria-label="Close now playing"><Icon name="down" size={26} /></button>
 
   <div class="stage">
     <div class="left">
@@ -60,7 +60,6 @@
     border-radius: 50%;
     display: grid;
     place-items: center;
-    background: var(--glass);
   }
   .stage {
     position: relative;

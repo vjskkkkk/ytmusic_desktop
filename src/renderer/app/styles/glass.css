@@ -1,0 +1,149 @@
+/* ---------- Liquid Glass material ----------
+   Follows .claude/skills/liquid-glass: glass only on the floating layer (title bar and player bar,
+   which page content scrolls under); controls inside pages use the static variant (same fill, rim
+   and key light, no backdrop-filter, no per-frame cost). Colours come from the theme tokens in
+   app.css, so every theme, including user themes, gets matching glass.
+
+   --lg-clarity is set from the "Glass" slider in settings (0 = solid, 1 = clearest). */
+
+:root {
+  --lg-clarity: 0.6;
+
+  /* fill alpha per tier. Regular bottoms out at 0.55: a dark fill needs about 0.59 to hold 4.5:1
+     for light text over pure white, and the blur averages the rest (skill section 5). */
+  --lg-regular-a: calc(0.94 - 0.39 * var(--lg-clarity));
+  --lg-thin-a: calc(var(--lg-regular-a) - 0.12);
+  --lg-thick-a: min(0.96, calc(var(--lg-regular-a) + 0.14));
+
+  --lg-blur: calc(14px + 14px * var(--lg-clarity));
+  --lg-sat: 140%;
+
+  --lg-surface: var(--bg-elev);
+  --lg-regular: color-mix(in oklab, var(--lg-surface) calc(var(--lg-regular-a) * 100%), transparent);
+  --lg-thin: color-mix(in oklab, var(--lg-surface) calc(var(--lg-thin-a) * 100%), transparent);
+  --lg-thick: color-mix(in oklab, var(--lg-surface) calc(var(--lg-thick-a) * 100%), transparent);
+  --lg-solid: var(--lg-surface);
+
+  /* edges and light: hairline, top key light, soft shadow tinted from the page ink */
+  --lg-light: color-mix(in oklab, white 15%, transparent);
+  --lg-edge: color-mix(in oklab, var(--text) 11%, transparent);
+  --lg-shadow: 0 10px 34px color-mix(in oklab, color-mix(in oklab, var(--bg) 35%, black) 42%, transparent);
+  --lg-rim: inset 0 1px 0 var(--lg-light), inset 0 0 0 1px var(--lg-edge);
+
+  /* static controls inside pages */
+  --lg-ctl: color-mix(in oklab, var(--text) calc(5% + 4% * var(--lg-clarity)), var(--lg-regular));
+  --lg-ctl-hover: color-mix(in oklab, var(--text) 13%, var(--lg-regular));
+  --lg-selected: color-mix(in oklab, var(--accent) 24%, var(--lg-regular));
+  --lg-selected-edge: color-mix(in oklab, var(--accent) 55%, transparent);
+  /* tinted primary: accent at 84% keeps the material's character (skill 17.3) */
+  --lg-primary: color-mix(in oklab, var(--accent) 84%, transparent);
+
+  --lg-r-bar: 18px;
+  --lg-r-control: 12px;
+}
+
+:root[data-theme='daylight'] {
+  --lg-light: color-mix(in oklab, white 75%, transparent);
+  --lg-edge: color-mix(in oklab, var(--text) 10%, transparent);
+  --lg-shadow: 0 10px 30px color-mix(in oklab, var(--text) 14%, transparent);
+  --lg-ctl: color-mix(in oklab, white calc(40% + 20% * var(--lg-clarity)), var(--bg-elev-2));
+  --lg-ctl-hover: color-mix(in oklab, white 25%, var(--bg-hover));
+}
+
+/* ---------- tiers ---------- */
+
+/* Fallback first: legible without backdrop-filter. */
+.lg-regular, .lg-thin, .lg-thick {
+  position: relative;
+  background: var(--lg-solid);
+  box-shadow: var(--lg-rim), var(--lg-shadow);
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  .lg-regular { background: var(--lg-regular); backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-sat)); }
+  .lg-thin { background: var(--lg-thin); backdrop-filter: blur(calc(var(--lg-blur) * 0.7)) saturate(var(--lg-sat)); }
+  .lg-thick { background: var(--lg-thick); backdrop-filter: blur(calc(var(--lg-blur) * 1.15)) saturate(var(--lg-sat)); }
+}
+
+/* Edge-concentrated lensing (Chromium only). The displacement map is drawn from the element's own
+   outline by lib/glass.js; the plain frosted pane above is the designed baseline.
+   Blur goes first: Chromium drops most of a CSS blur that follows an SVG url() in backdrop-filter
+   (measured on the deck), and bending an already-frosted backdrop reads the same at the rim. */
+@supports (backdrop-filter: url(#a) blur(1px)) {
+  .lg-regular.lg-lens { backdrop-filter: blur(var(--lg-blur)) var(--lg-lens, ) saturate(var(--lg-sat)); }
+}
+
+/* Same look with no backdrop sampling, for surfaces sitting on the page rather than above
+   scrolling content (sidebar). */
+.lg-static {
+  background: var(--lg-regular);
+  box-shadow: var(--lg-rim);
+}
+
+/* ---------- controls ---------- */
+
+.lg-ctl {
+  background: var(--lg-ctl);
+  box-shadow: var(--lg-rim);
+  transition: background-color 0.18s var(--ease), box-shadow 0.18s var(--ease), transform 0.18s var(--ease);
+}
+.lg-ctl:hover:not(:disabled) { background: var(--lg-ctl-hover); }
+
+/* the selected item in a group */
+.lg-selected, .lg-ctl.lg-selected {
+  background: var(--lg-selected);
+  box-shadow: inset 0 1px 0 var(--lg-light), inset 0 0 0 1px var(--lg-selected-edge);
+}
+.lg-selected:hover:not(:disabled) { background: color-mix(in oklab, var(--accent) 30%, var(--lg-regular)); }
+
+/* the one primary action in a group */
+.lg-primary {
+  background: var(--lg-primary);
+  color: var(--accent-ink);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, white 40%, transparent), inset 0 0 0 1px color-mix(in oklab, var(--accent) 60%, white 10%),
+    0 6px 18px color-mix(in oklab, var(--accent) 30%, transparent);
+  transition: background-color 0.18s var(--ease), transform 0.18s var(--ease);
+}
+.lg-primary:hover:not(:disabled) { background: color-mix(in oklab, var(--accent) 94%, white); }
+
+/* press: light spreads from the point of contact (lib/glass.js writes --press-x/y) */
+.lg-ctl, .lg-primary, .lg-selected { isolation: isolate; overflow: hidden; }
+.lg-ctl::after, .lg-primary::after, .lg-selected::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--press-x, 50%) var(--press-y, 50%), color-mix(in oklab, white 28%, transparent), transparent 60%);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+  z-index: -1;
+}
+.lg-ctl:active:not(:disabled)::after, .lg-primary:active:not(:disabled)::after, .lg-selected:active::after { opacity: 1; transform: scale(1.4); transition-duration: 0.12s; }
+.lg-ctl:active:not(:disabled), .lg-primary:active:not(:disabled) { transform: scale(0.97); }
+.lg-ctl, .lg-primary, .lg-selected { position: relative; }
+
+/* ---------- off switches ---------- */
+
+:root[data-glass='off'] .lg-regular,
+:root[data-glass='off'] .lg-thin,
+:root[data-glass='off'] .lg-thick,
+:root[data-glass='off'] .lg-static {
+  background: var(--lg-solid);
+  backdrop-filter: none;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .lg-regular, .lg-thin, .lg-thick, .lg-static { background: var(--lg-solid); backdrop-filter: none; }
+}
+@media (prefers-contrast: more) {
+  .lg-regular, .lg-thin, .lg-thick, .lg-static { background: var(--lg-solid); backdrop-filter: none; box-shadow: inset 0 0 0 1px var(--text); }
+  .lg-ctl { box-shadow: inset 0 0 0 1px var(--text-dim); }
+}
+@media (forced-colors: active) {
+  .lg-regular, .lg-thin, .lg-thick, .lg-static, .lg-ctl, .lg-selected, .lg-primary {
+    background: Canvas; border: 1px solid CanvasText; backdrop-filter: none; box-shadow: none;
+  }
+  .lg-selected { border-color: Highlight; }
+}

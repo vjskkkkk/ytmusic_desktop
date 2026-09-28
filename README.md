@@ -1,8 +1,8 @@
 # YT Mini
 
-A YouTube Music desktop app for Windows with its own interface, themes, and two mini players:
-a modern one that shrinks to a thin strip, and a classic Winamp 2 player that loads real `.wsz` skins
-and shows album art.
+A YouTube Music desktop app for Windows with its own interface, themes, a Liquid Glass look, world
+internet radio, and two mini players: a modern one that shrinks to a thin strip, and a classic Winamp 2
+player that loads real `.wsz` skins and shows album art.
 
 ## Run
 
@@ -23,6 +23,9 @@ npm run dist       # Windows installer in dist/
   lyrics with [youtubei.js](https://github.com/LuanRT/YouTube.js), using the engine's signed-in cookies.
   `src/main/ytm-map.js` turns the responses into plain data for the UI.
 - **Interface:** Svelte app in `src/renderer/app`. Themes are CSS variable sets (`styles/app.css`).
+- **Radio:** `src/main/radio.js` reads the community [Radio Browser](https://www.radio-browser.info/) directory
+  (no key needed). Streams play in the app window (`lib/radio.svelte.js`); the main process mirrors the station
+  to the modern mini player and tray, and YouTube Music and the radio pause each other.
 - **Mini players:** `src/renderer/mini-modern` (resizable, album art) and `src/renderer/mini-classic`
   ([Webamp](https://github.com/captbaritone/webamp) wired to the engine, with EQ and visualizer).
 
@@ -42,6 +45,20 @@ on `:root`, for example:
 ```
 
 Then choose it under **Themes and settings** (use **Reload themes** after editing).
+
+## Glass
+
+Title bar and player bar are frosted glass that page content scrolls under; buttons, chips and selected items
+use the same material without the per-frame blur. Set how see-through it is under **Themes and settings →
+Glass** (Solid turns it off). The glass takes its colours from the current theme, including your own themes.
+Design rules follow the [Liquid Glass skill](https://github.com/Armitanemati/liquid-glass-claude-skill)
+(MIT), vendored in `.claude/skills/liquid-glass`.
+
+## Radio
+
+Open **Radio** in the sidebar, pick a genre or search for a station by name. Stations are sorted by how many
+people listen to them. Space, Ctrl+← / Ctrl+→ and the mini player's buttons play/stop and move between
+stations while the radio is on. Only streams Chromium can play directly (MP3, AAC, Ogg/Opus, no HLS) are listed.
 
 ## Winamp skins
 

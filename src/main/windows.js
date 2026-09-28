@@ -9,6 +9,11 @@ const PRELOAD = (name) => path.join(__dirname, '..', 'preload', `${name}.js`);
 
 const w = { app: null, mini: null, classic: null, tray: null };
 
+// Internet radio plays in the app window. While it does, the mini player and tray show the
+// station and their play/next/prev act on the radio instead of YouTube Music.
+const radio = { active: false, state: { hasTrack: false } };
+const playerState = () => (radio.active ? radio.state : engine.state);
+
 function loadPage(win, page) {
   if (process.argv.includes('--dev')) return win.loadURL(`http://localhost:5173/${page}/index.html`);
   return win.loadFile(path.join(__dirname, '..', '..', 'dist-renderer', page, 'index.html'));
@@ -28,7 +33,8 @@ function createApp() {
     backgroundColor: '#0b0b10',
     titleBarStyle: 'hidden',
     titleBarOverlay: { color: '#00000000', symbolColor: '#ffffff', height: 40 },
-    webPreferences: { preload: PRELOAD('app') },
+    // backgroundThrottling off: radio keeps playing smoothly while the window hides behind the mini player
+    webPreferences: { preload: PRELOAD('app'), backgroundThrottling: false },
   });
   if (settings.appMaximized) w.app.maximize();
   w.app.once('ready-to-show', () => w.app.show());
@@ -52,7 +58,7 @@ function createApp() {
   w.app.on('resize', rememberBounds);
   w.app.on('move', rememberBounds);
   w.app.on('minimize', () => {
-    if (settings.minimizeToMini && engine.state.hasTrack) showMini();
+    if (settings.minimizeToMini && playerState().hasTrack) showMini();
   });
   w.app.on('closed', () => {
     w.app = null;
@@ -183,7 +189,8 @@ function resizeClassic(width, height) {
 
 // ---------- switching ----------
 
-const activeMini = () => (settings.miniStyle === 'classic' ? w.classic : w.mini);
+// The Winamp player is wired to YouTube Music's audio (EQ, visualizer), so radio uses the modern one.
+const activeMini = () => (settings.miniStyle === 'classic' && !radio.active ? w.classic : w.mini);
 const allMinis = () => [w.mini, w.classic].filter(Boolean);
 
 let hoverTimer = null;
@@ -258,14 +265,54 @@ function setMiniStyle(style) {
 
 function pushTo(win) {
   if (!win || win.isDestroyed()) return;
-  win.webContents.send('player:state', engine.state);
-  win.webContents.send('player:queue', engine.queue);
+  win.webContents.send('player:state', playerState());
+  win.webContents.send('player:queue', radio.active ? [] : engine.queue);
   win.webContents.send('mini:pinned', settings.miniOnTop);
 }
 
 function broadcast(channel, payload) {
   for (const win of [w.app, w.mini, w.classic]) {
     if (win && !win.isDestroyed() && (win === w.app || win.isVisible())) win.webContents.send(channel, payload);
+  }
+}
+
+// Engine state always reaches the app; mini players and the tray follow the radio while it plays.
+function onEngineState(s) {
+  if (w.app && !w.app.isDestroyed()) w.app.webContents.send('player:state', s);
+  if (radio.active) return;
+  for (const m of allMinis()) if (!m.isDestroyed() && m.isVisible()) m.webContents.send('player:state', s);
+  updateTrayTip(s);
+}
+
+function setRadioState(s) {
+  const wasActive = radio.active;
+  radio.active = !!s?.active;
+  radio.state = radio.active
+    ? {
+        hasTrack: true,
+        live: true,
+        title: String(s.title || 'Radio').slice(0, 200),
+        artist: String(s.subtitle || 'Live radio').slice(0, 200),
+        art: typeof s.art === 'string' && /^https:\/\//.test(s.art) ? s.art : '',
+        playing: !!s.playing,
+        time: 0,
+        duration: 0,
+      }
+    : { hasTrack: false };
+  const state = playerState();
+  for (const m of allMinis()) if (!m.isDestroyed() && m.isVisible()) m.webContents.send('player:state', state);
+  if (radio.active !== wasActive) for (const m of allMinis()) if (!m.isDestroyed()) m.webContents.send('player:queue', radio.active ? [] : engine.queue);
+  updateTrayTip(state);
+  // Radio started while the Winamp player is up: swap to the modern one.
+  if (radio.active && !wasActive && w.classic?.isVisible()) showMini();
+}
+
+// play/pause, next and previous from the mini players and tray.
+function playerCommand(cmd, arg) {
+  if (radio.active && (cmd === 'playPause' || cmd === 'next' || cmd === 'prev')) {
+    if (w.app && !w.app.isDestroyed()) w.app.webContents.send('radio:cmd', cmd);
+  } else {
+    engine.send(cmd, arg);
   }
 }
 
@@ -292,9 +339,9 @@ function buildTrayMenu() {
     { label: 'Open YT Mini', click: showApp },
     { label: 'Mini player', click: showMini },
     { type: 'separator' },
-    { label: 'Play / Pause', click: () => engine.send('playPause') },
-    { label: 'Next', click: () => engine.send('next') },
-    { label: 'Previous', click: () => engine.send('prev') },
+    { label: 'Play / Pause', click: () => playerCommand('playPause') },
+    { label: 'Next', click: () => playerCommand('next') },
+    { label: 'Previous', click: () => playerCommand('prev') },
     { type: 'separator' },
     {
       label: 'Mini player style',
@@ -340,5 +387,5 @@ function createTray() {
 module.exports = {
   w, createApp, createMini, createClassic, createTray, resizeClassic, applyClassicScale, setTitleBarColors,
   showMini, showApp, toggleMini, setPinned, setMiniStyle, buildTrayMenu, updateTrayTip,
-  broadcast, sendToAll,
+  broadcast, sendToAll, onEngineState, setRadioState, playerCommand, radio,
 };

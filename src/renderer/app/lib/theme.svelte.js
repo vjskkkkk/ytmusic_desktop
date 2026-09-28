@@ -2,6 +2,7 @@ import { ytm } from './bridge.js';
 import { player } from './player.svelte.js';
 import { paletteFromImage } from './color.js';
 import { readPledit, classicVars } from './skin-colors.js';
+import { applyGlass } from './glass.js';
 
 export const BUILT_IN = [
   { id: 'midnight', name: 'Midnight', note: 'Plum ink with brass', swatch: ['#15131c', '#272433', '#d9ae52'] },
@@ -86,11 +87,13 @@ export async function initTheme() {
   const settings = await ytm.getSettings();
   await reloadUserThemes();
   lastSkin = settings?.skin ?? null;
+  applyGlass(settings?.glass ?? 60);
   await applyTheme(settings?.theme || 'midnight');
 
   ytm.onSettings((s) => {
     const skinChanged = s.skin !== lastSkin;
     lastSkin = s.skin;
+    applyGlass(s.glass);
     if (s.theme !== theme.id || (skinChanged && theme.id === 'classic')) applyTheme(s.theme);
   });
 

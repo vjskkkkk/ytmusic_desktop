@@ -4,6 +4,7 @@ const fs = require('fs');
 const { settings, loadSettings, saveSettings, writeSettings } = require('./settings');
 const engine = require('./engine');
 const ytmusic = require('./ytmusic');
+const radio = require('./radio');
 const skins = require('./skins');
 const win = require('./windows');
 
@@ -32,12 +33,15 @@ const SETTABLE = {
   classicScale: (v) => v === 1 || v === 2 || v === 3,
   classicArt: (v) => typeof v === 'boolean',
   skin: (v) => v === null || (typeof v === 'string' && skins.list().some((s) => s.file === v)),
+  glass: (v) => Number.isInteger(v) && v >= 0 && v <= 100,
+  userName: (v) => v === '' || (typeof v === 'string' && v.trim().length > 0 && v.trim().length <= 40),
 };
 
 const publicSettings = () => Object.fromEntries(Object.keys(SETTABLE).map((k) => [k, settings[k]]));
 
 function setSetting(key, value) {
   if (!SETTABLE[key] || !SETTABLE[key](value)) return false;
+  if (key === 'userName') value = value.trim();
   if (key === 'miniStyle') win.setMiniStyle(value);
   else if (key === 'miniOnTop') win.setPinned(value);
   else {
@@ -140,9 +144,23 @@ function wireIpc() {
   });
   ipcMain.handle('ytm:image', (e, url) => (trusted(e) ? ytmusic.image(url) : null));
   ipcMain.on('player:cmd', (e, cmd, arg) => {
-    if (trusted(e) && PLAYER_COMMANDS.has(cmd)) engine.send(cmd, arg);
+    if (!trusted(e) || !PLAYER_COMMANDS.has(cmd)) return;
+    // The app window drives its own radio; mini players and the tray go through playerCommand.
+    if (fromApp(e)) engine.send(cmd, arg);
+    else win.playerCommand(cmd, arg);
   });
-  ipcMain.handle('player:get', (e) => (trusted(e) ? { state: engine.state, queue: engine.queue } : null));
+  ipcMain.handle('player:get', (e) => {
+    if (!trusted(e)) return null;
+    if (!fromApp(e) && win.radio.active) return { state: win.radio.state, queue: [] };
+    return { state: engine.state, queue: engine.queue };
+  });
+
+  // internet radio
+  ipcMain.handle('radio:api', (e, method, args) => {
+    if (!fromApp(e)) throw new Error('Not allowed');
+    return radio.call(String(method), Array.isArray(args) ? args : []);
+  });
+  ipcMain.on('radio:state', (e, s) => { if (fromApp(e)) win.setRadioState(s && typeof s === 'object' ? s : null); });
 
   // sign-in and the classic YTM view
   ipcMain.handle('auth:status', (e) => (trusted(e) ? engine.isSignedIn() : false));
@@ -209,10 +227,7 @@ function wireIpc() {
 // ---------- engine events ----------
 
 function wireEngine() {
-  engine.on('state', (s) => {
-    win.broadcast('player:state', s);
-    win.updateTrayTip(s);
-  });
+  engine.on('state', win.onEngineState);
   engine.on('queue', (q) => win.broadcast('player:queue', q));
   engine.on('viz', (frame) => {
     const c = win.w.classic;

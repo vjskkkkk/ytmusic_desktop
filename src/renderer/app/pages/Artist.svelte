@@ -21,8 +21,8 @@
       <h1>{a.name}</h1>
       {#if a.subscribers}<p class="subs">{a.subscribers}</p>{/if}
       <div class="actions">
-        {#if a.shuffle}<button class="primary" onclick={() => play(a.shuffle)}><Icon name="shuffle" size={20} />Shuffle</button>{/if}
-        {#if a.radio}<button class="ghost" onclick={() => play(a.radio)}><Icon name="radio" size={20} />Radio</button>{/if}
+        {#if a.shuffle}<button class="primary lg-primary" onclick={() => play(a.shuffle)}><Icon name="shuffle" size={20} />Shuffle</button>{/if}
+        {#if a.radio}<button class="ghost lg-ctl" onclick={() => play(a.radio)}><Icon name="radio" size={20} />Radio</button>{/if}
       </div>
     </div>
   </header>
@@ -71,8 +71,6 @@
     border-radius: var(--r-pill);
     font-weight: 650;
   }
-  .primary { background: var(--accent); color: var(--accent-ink); }
-  .ghost { background: var(--glass); }
   .bio { max-width: 72ch; margin: 8px 0 4px; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   .bio.expanded { display: block; }
   .toggle { color: var(--text); font-weight: 600; font-size: 13px; margin-bottom: 36px; }
